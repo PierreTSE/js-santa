@@ -1,0 +1,3 @@
+class Santa extends Entity{
+
+}

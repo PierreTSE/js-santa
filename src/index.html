@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="frr">
+<head>
+    <meta charset="UTF-8">
+
+    <style>
+        #cv {
+            border: 1px solid #000000;
+        }
+    </style>
+
+    <title>Le Père Noël est une poubelle</title>
+</head>
+<body onload="startGame()">
+
+<!--Main Canvas to render the game-->
+<canvas id="cv" width="800" height="600"></canvas>
+
+<script src="utilities.js"></script>
+<script src="Entity.js"></script>
+<script src="Game.js"></script>
+<script>
+    // framerate in ms
+    const FRAMERATE = 30;
+
+    // instance of the game
+    let game = new Game(document.getElementById("cv"));
+
+    // starts game on page load
+    function startGame() {
+        game.start();
+    }
+</script>
+
+</body>
+</html>
