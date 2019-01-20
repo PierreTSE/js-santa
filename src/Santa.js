@@ -48,8 +48,8 @@ class Santa extends Entity{
             const nb = (up | 0) + (down | 0) + (left | 0) + (right | 0);
 
             this.isMoving = true;
-            this.move((((right | 0) - (left | 0)) * this.speed) / Math.sqrt(nb) * FRAMERATE,
-                ((down | 0) - (up | 0)) * this.speed / Math.sqrt(nb) * FRAMERATE,
+            this.move((((right | 0) - (left | 0)) * this.speed) / Math.sqrt(nb) * FRAMETIME,
+                ((down | 0) - (up | 0)) * this.speed / Math.sqrt(nb) * FRAMETIME,
                 canvasWidth,
                 canvasHeight);
         }

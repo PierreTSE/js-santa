@@ -12,18 +12,19 @@ class Game {
         this.bg.src = "../rc/snow.jpg";
 
         // player santa
-        this.santa = new Santa("../rc/santa.png", 3, 4);
+        let santa = new Santa("../rc/santa.png", 3, 4, 0.5);
+        santa.speed = 0.2;
 
         // all the Entity managed in the game
         this.entities = [];
-        this.entities.push(this.santa);
+        this.entities.push(santa);
 
         // map of every keys currently pressed
         this.keys = [];
     }
 
     start() {
-        this.interval = setInterval(this.update.bind(this), FRAMERATE);
+        this.interval = setInterval(this.update.bind(this), FRAMETIME);
 
         window.addEventListener('keydown', (e) => {
             e.preventDefault();
