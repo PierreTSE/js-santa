@@ -38,10 +38,10 @@ function intersects(x1, y1, dx1, dy1, x2, y2, dx2, dy2) {
     const r2MaxY = Math.max(y2, (y2 + dy2));
 
     // Compute the intersection boundaries
-    interLeft = Math.max(r1MinX, r2MinX);
-    interTop = Math.max(r1MinY, r2MinY);
-    interRight = Math.min(r1MaxX, r2MaxX);
-    interBottom = Math.min(r1MaxY, r2MaxY);
+    const interLeft = Math.max(r1MinX, r2MinX);
+    const interTop = Math.max(r1MinY, r2MinY);
+    const interRight = Math.min(r1MaxX, r2MaxX);
+    const interBottom = Math.min(r1MaxY, r2MaxY);
 
     // If the intersection is valid (positive non zero area), then there is an intersection
     return (interLeft < interRight) && (interTop < interBottom);
