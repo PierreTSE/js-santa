@@ -12,7 +12,7 @@ class Game {
         this.bg.src = "../rc/snow.jpg";
 
         // player santa
-        this.santa = new Entity("../rc/santa.png", 3, 4);
+        this.santa = new Santa("../rc/santa.png", 3, 4);
 
         // all the Entity managed in the game
         this.entities = [];
