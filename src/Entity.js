@@ -43,10 +43,9 @@ class Entity {
 
         // sprite selection attributes
         this.orientation = 2;
-        this.isMoving = false;
 
         // gameplay attributes
-        this.speed = 0.1;
+        this.speed = 0; // default speed
     }
 
     /**

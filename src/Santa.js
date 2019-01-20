@@ -1,5 +1,15 @@
 class Santa extends Entity{
     /**
+     * {@link Entity#constructor}
+     */
+    constructor(spriteSource, nX, nY, horatio) {
+        super(spriteSource, nX, nY, horatio);
+
+        // gameplay attributes
+        this.speed = 0.2
+    }
+
+    /**
      * Updates the orientation and the position of the sprite according to the currently pressed keys.
      * @param elapsedTime the time between this frame and the previous one
      * @param keys Map where the currently pressed keys are set to true.

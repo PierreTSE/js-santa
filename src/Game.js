@@ -13,7 +13,6 @@ class Game {
 
         // player santa
         let santa = new Santa("../rc/santa.png", 3, 4, 0.5);
-        santa.speed = 0.2;
 
         // all the Entity managed in the game
         this.entities = [];
