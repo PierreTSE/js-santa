@@ -1,11 +1,12 @@
 class Santa extends Entity{
     /**
      * Updates the orientation and the position of the sprite according to the currently pressed keys.
+     * @param elapsedTime the time between this frame and the previous one
      * @param keys Map where the currently pressed keys are set to true.
      * @param canvasWidth Width of the game canvas
      * @param canvasHeight Height of the game canvas
      */
-    update(keys, canvasWidth, canvasHeight) {
+    update(elapsedTime, keys, canvasWidth, canvasHeight) {
         if (!Array.isArray(keys)) {
             throw new Error("IllegalArgument : keys must ba an array of currently pressed keys");
         }
@@ -48,8 +49,8 @@ class Santa extends Entity{
             const nb = (up | 0) + (down | 0) + (left | 0) + (right | 0);
 
             this.isMoving = true;
-            this.move((((right | 0) - (left | 0)) * this.speed) / Math.sqrt(nb) * FRAMETIME,
-                ((down | 0) - (up | 0)) * this.speed / Math.sqrt(nb) * FRAMETIME,
+            this.move((((right | 0) - (left | 0)) * this.speed) / Math.sqrt(nb) * elapsedTime,
+                ((down | 0) - (up | 0)) * this.speed / Math.sqrt(nb) * elapsedTime,
                 canvasWidth,
                 canvasHeight);
         }

@@ -21,9 +21,13 @@ class Game {
 
         // map of every keys currently pressed
         this.keys = [];
+
+        // timing attributes
+        this.previousTime = Date.now();
     }
 
     start() {
+        const FRAMETIME = 1000 / 60;
         this.interval = setInterval(this.update.bind(this), FRAMETIME);
 
         window.addEventListener('keydown', (e) => {
@@ -37,13 +41,18 @@ class Game {
     }
 
     update() {
+        const currentTime = Date.now();
+        const elapsedTime = currentTime - this.previousTime;
+
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.drawBG();
 
         this.entities.forEach((e) => {
-            e.update(this.keys, this.canvas.width, this.canvas.height);
+            e.update(elapsedTime, this.keys, this.canvas.width, this.canvas.height);
             e.draw(this.context);
         });
+
+        this.previousTime = currentTime;
     }
 
     stop() {
