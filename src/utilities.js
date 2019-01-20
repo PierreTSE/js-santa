@@ -1,5 +1,5 @@
 /**
- * Returns a number whose value is limited to the given range.
+ * Clamps the given number into the given range.
  *
  * @param num The input number to clamp.
  * @param {Number} min The lower boundary of the output range.
@@ -45,4 +45,24 @@ function intersects(x1, y1, dx1, dy1, x2, y2, dx2, dy2) {
 
     // If the intersection is valid (positive non zero area), then there is an intersection
     return (interLeft < interRight) && (interTop < interBottom);
+}
+
+/**
+ * Generates a random number in the given range.
+ * @param min lower boundary of the range.
+ * @param max upper boundary of the range.
+ * @returns {number} A random number.
+ */
+function random(min, max) {
+    return Math.random() * (max - min) + min;
+}
+
+/**
+ * Generates a random integer in the given range.
+ * @param min lower boundary of the range.
+ * @param max upper boundary of the range.
+ * @returns {number} A random integer.
+ */
+function randint(min, max) {
+    return Math.round(random(min, max));
 }
