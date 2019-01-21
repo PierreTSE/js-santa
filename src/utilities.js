@@ -82,3 +82,17 @@ function random(min, max) {
 function randint(min, max) {
     return Math.floor(random(min, max + 1));
 }
+
+/**
+ * Format a time in s into a mm:ss format.
+ * @param s input time in s
+ * @returns {string} a mm:ss formatted string
+ */
+function s2mmss(s) {
+    if (s <= 0)
+        return "0:00";
+    else {
+        const ss = s % 60;
+        return Math.floor(s / 60) + ":" + (ss ? (ss < 10 ? "0" + ss.toFixed(2) : ss.toFixed(2)) : "00")
+    }
+}
