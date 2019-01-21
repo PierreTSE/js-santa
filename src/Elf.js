@@ -3,11 +3,12 @@ class Elf extends AnimatedEntity {
      * Constructor of Elf.
      */
     constructor() {
-        super("../rc/images/elf.png", 3, 4, 1);
+        super("../rc/images/elf2.png", 3, 4, 1);
 
         // gameplay attributes
         this.speed = 0.07;
         this.isStunned = false;
+        this.STUN_TIME = 15000; // ms
 
         // elf IA attributes
         this.REORIENTATE_CHANCE = 0.7; // chance to reorientate if he can
@@ -35,7 +36,13 @@ class Elf extends AnimatedEntity {
      */
     update(elapsedTime, keys, canvasWidth, canvasHeight) {
 
-        if (this.wantsToReorientate) {
+        if (this.isStunned) {
+            this.stunTime += elapsedTime;
+            if (this.stunTime >= this.STUN_TIME) {
+                this.isStunned = false;
+            }
+        }
+        else if (this.wantsToReorientate) {
             this.resetInputs();
 
             switch (randint(0, 8)) {
@@ -152,5 +159,10 @@ class Elf extends AnimatedEntity {
         this.down = false;
         this.left = false;
         this.right = false;
+    }
+
+    stun() {
+        this.stunTime = 0;
+        this.isStunned = true;
     }
 }
