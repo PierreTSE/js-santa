@@ -14,7 +14,7 @@ class Elf extends Character {
         this.wantsToReorientate = true; // if he currently wants to change direction
         this.MIN_TIME_BEFORE_REORIENTATE = 200;
         this.MAX_TIME_BEFORE_REORIENTATE = 700;
-        this.timeBeforeReorientate = randint(this.MIN_TIME_BEFORE_REORIENTATE, this.MAX_TIME_BEFORE_REORIENTATE); // minimal time in ms before the elf changes direction
+        this.walkingPeriod = randint(this.MIN_TIME_BEFORE_REORIENTATE, this.MAX_TIME_BEFORE_REORIENTATE); // minimal time in ms before the elf changes direction
 
         // current virtual inputs
         this.up = false;
@@ -33,10 +33,7 @@ class Elf extends Character {
     update(elapsedTime, keys, canvasWidth, canvasHeight) {
 
         if (this.wantsToReorientate) {
-            this.up = false;
-            this.down = false;
-            this.left = false;
-            this.right = false;
+            this.resetInputs();
 
             switch (randint(0, 8)) {
                 case 0:
@@ -86,7 +83,39 @@ class Elf extends Character {
         }
         else {
             this.timeSpentInThisOrientation += elapsedTime;
-            if (this.timeSpentInThisOrientation >= this.timeBeforeReorientate) {
+
+            if (this.timeSpentInThisOrientation >= this.walkingPeriod) {
+                // this part prevents elves to come too close to the border of the canvas
+                const minDistToBorder = 10; // in px
+                if (this.y < minDistToBorder) {
+                    this.resetInputs();
+                    this.down = true;
+                    this.orientation = 3;
+                    this.timeSpentInThisOrientation = 0;
+                }
+                else if (this.y + this.HEIGHT > canvasHeight - minDistToBorder) {
+                    this.resetInputs();
+                    this.up = true;
+                    this.orientation = 1;
+                    this.timeSpentInThisOrientation = 0;
+                }
+
+                if (this.x < minDistToBorder) {
+                    this.resetInputs();
+                    this.right = true;
+                    this.orientation = 2;
+                    this.timeSpentInThisOrientation = 0;
+                }
+                else if (this.x + this.WIDTH > canvasWidth - minDistToBorder) {
+                    this.resetInputs();
+                    this.left = true;
+                    this.orientation = 4;
+                    this.timeSpentInThisOrientation = 0;
+                }
+            }
+
+            if (this.timeSpentInThisOrientation >= this.walkingPeriod) {
+                // this part reorientates with a random chance after a period of walking
                 if (Math.random() < this.REORIENTATE_CHANCE) {
                     this.wantsToReorientate = true;
                 }
@@ -94,7 +123,7 @@ class Elf extends Character {
                     this.timeSpentInThisOrientation = 0;
                 }
 
-                this.timeBeforeReorientate = randint(this.MIN_TIME_BEFORE_REORIENTATE, this.MAX_TIME_BEFORE_REORIENTATE);
+                this.walkingPeriod = randint(this.MIN_TIME_BEFORE_REORIENTATE, this.MAX_TIME_BEFORE_REORIENTATE);
             }
         }
 
@@ -102,11 +131,18 @@ class Elf extends Character {
         const nb = (this.up | 0) + (this.down | 0) + (this.left | 0) + (this.right | 0);
 
         if (nb === 0)
-            return;
+            return; // no inputs, stays in place
 
         this.move((((this.right | 0) - (this.left | 0)) * this.speed) / Math.sqrt(nb) * elapsedTime,
             ((this.down | 0) - (this.up | 0)) * this.speed / Math.sqrt(nb) * elapsedTime,
             canvasWidth,
             canvasHeight);
+    }
+
+    resetInputs() {
+        this.up = false;
+        this.down = false;
+        this.left = false;
+        this.right = false;
     }
 }
