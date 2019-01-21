@@ -3,7 +3,7 @@ class Tree extends UnanimatedEntity {
      * {@link Entity#constructor}
      */
     constructor(spriteSource, nX, nY, horatio, canvasWidth, canvasHeight) {
-        super("../rc/good_tree.png", 4, 1, 1);
+        super(spriteSource, nX, nY, horatio, 1);
 
         this.spritesheet.addEventListener("load", () => {
             this.x = random(0, canvasWidth - this.WIDTH);
