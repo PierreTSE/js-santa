@@ -44,7 +44,7 @@ class Game {
 
         // tree spawning
         this.timeSincePreviousBlossom = 0;
-        this.TIME_BETWEEN_BLOSSOM = 1000; // TODO should be 10000
+        this.TIME_BETWEEN_BLOSSOM = 10000;
 
         // debug infos
         this.DEBUG_MODE = true;
@@ -84,7 +84,36 @@ class Game {
                 // spawn good tree
                 tree = new GoodTree(this.canvas.width, this.canvas.height);
             }
-            this.uaEntities.push(tree);
+
+            tree.spritesheet.addEventListener("load", () => {
+                // this part sets a new random position to the tree while it is overlapping with another one
+                let isInGoodPos;
+                let tries = 0;
+                let MAX_TRIES = 10000;
+                do {
+                    tree.setRandomPosition();
+                    isInGoodPos = true;
+                    for (let i in this.uaEntities) {
+                        if (intersects(tree.x, tree.y, tree.WIDTH, tree.HEIGHT, this.uaEntities[i].x, this.uaEntities[i].y, this.uaEntities[i].WIDTH, this.uaEntities[i].HEIGHT)) {
+                            isInGoodPos = false;
+                            break;
+                        }
+                    }
+
+                    if (++tries === MAX_TRIES) {
+                        break;
+                    }
+
+                } while (!isInGoodPos);
+
+                // blossom the tree
+                if (tries < MAX_TRIES) {
+                    this.uaEntities.push(tree);
+                }
+                else {
+                    console.warn("Tree could not be created because of missing place in game area.");
+                }
+            });
         }
 
         // update every Entity
@@ -155,7 +184,7 @@ class Game {
                 const collidingEntity = this.uaEntities[i];
                 if (collidingEntity instanceof BadTree || collidingEntity instanceof GoodTree) {
                     this.santa.gift -= collidingEntity.TAKEN_GIFTS;
-                    this.uaEntities.slice(i, 1);
+                    this.uaEntities.splice(i, 1);
                     currentUAEntitiesLength--;
                 }
                 // TODO Ball here
