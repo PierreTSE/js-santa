@@ -15,15 +15,15 @@ class Game {
         this.bg.src = "../rc/snow.jpg";
 
         // player santa
-        this.santa = new Santa("../rc/santa.png", 3, 4, 0.5);
+        this.santa = new Santa();
 
-        // all the Character managed in the game
+        // all the Entity managed in the game
         this.entities = [];
         this.entities.push(this.santa); //TODO uncomment
 
         // TODO remove test elf
         for (let i = 0; i < 15; i++) {
-            let elf = new Elf("../rc/elf.png", 3, 4);
+            let elf = new Elf();
             elf.x = random(0, this.canvas.width - 40);
             elf.y = random(0, this.canvas.height - 40);
             this.entities.push(elf);
@@ -119,15 +119,20 @@ class Game {
     }
 
     collideSanta() {
-        if (!this.santa.isIntangible) {
-            for (let i = 1; i < this.entities.length; ++i) {
-                if (intersects(this.santa.x, this.santa.y, this.santa.WIDTH, this.santa.HEIGHT, this.entities[i].x, this.entities[i].y, this.entities[i].WIDTH, this.entities[i].HEIGHT)) {
+        for (let i = 1; i < this.entities.length; ++i) {
+            if (intersects(this.santa.x, this.santa.y, this.santa.WIDTH, this.santa.HEIGHT, this.entities[i].x, this.entities[i].y, this.entities[i].WIDTH, this.entities[i].HEIGHT)) {
+                const collidingEntity = this.entities[i];
+                if (!this.santa.isIntangible && collidingEntity instanceof Elf) {
                     this.santa.gotHit(this.entities[i].x, this.entities[i].y, this.canvas.width, this.canvas.height);
-                    return true;
                 }
+                //else if (collidingEntity instanceof Tree) {
+                //TODO implémenter collision tree
+                //}
+                // else {
+                //     throw new Error("Can't determine type of colliding entity.");
+                // }
             }
         }
-        return false;
     }
 
     gameOver() {
