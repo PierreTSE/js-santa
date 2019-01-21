@@ -14,6 +14,9 @@ class Tree extends UnanimatedEntity {
 
     update(elapsedTime) {
         this.lifeTime += elapsedTime;
+        if (this.lifeTime >= this.LONGEVITY) {
+            this.isAlive = false;
+        }
     }
 
     setRandomPosition() {
