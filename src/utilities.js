@@ -13,7 +13,7 @@ function clamp(num, min, max) {
 /**
  * Checks if two rectangles intersect one another.
  * The implementation of this function is inspired by the SFML Rect#intersects function :
- * https://www.sfml-dev.org/documentation/2.0-fr/classsf_1_1Rect.php#a566740c8f58e01bb052266f47e7e1011
+ * https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1Rect.php#ac77531698f39203e4bbe023097bb6a13
  * @param x1 abscissa of the top-left point of the first rectangle
  * @param y1 ordinate of the top-left point of the first rectangle
  * @param dx1 width of the first rectangle
@@ -48,6 +48,22 @@ function intersects(x1, y1, dx1, dy1, x2, y2, dx2, dy2) {
 }
 
 /**
+ * Checks if a rectangle contains another.
+ * @param x1 abscissa of the top-left point of the first rectangle
+ * @param y1 ordinate of the top-left point of the first rectangle
+ * @param dx1 width of the first rectangle
+ * @param dy1 height of the first rectangle
+ * @param x2 abscissa of the top-left point of the second rectangle
+ * @param y2 ordinate of the top-left point of the second rectangle
+ * @param dx2 width of the second rectangle
+ * @param dy2 height of the second rectangle
+ * @returns {boolean} true if the first rectangle contains the second.
+ */
+function contains(x1, y1, dx1, dy1, x2, y2, dx2, dy2) {
+    return (x2 >= x1) && (x2 + dx2 <= x1 + dx1) && (y2 >= y1) && (y2 + dy2 <= y1 + dy1);
+}
+
+/**
  * Generates a random number in the given range.
  * @param min lower boundary of the range.
  * @param max upper boundary of the range.
@@ -64,5 +80,5 @@ function random(min, max) {
  * @returns {number} A random integer.
  */
 function randint(min, max) {
-    return Math.floor(random(min, max));
+    return Math.floor(random(min, max + 1));
 }
