@@ -1,4 +1,4 @@
-class Character extends Entity {
+class AnimatedEntity extends Entity {
     /**
      * {@link Entity#constructor}
      */
@@ -13,7 +13,7 @@ class Character extends Entity {
     }
 
     /**
-     * Draws the Character sprite on the given context.
+     * Draws the AnimatedEntity sprite on the given context.
      * @param context The context to draw onto.
      */
     draw(context) {
