@@ -26,13 +26,9 @@ class Game {
         this.santa = new Santa();
         this.aEntities.push(this.santa);
 
-        // TODO remove test elf
-        for (let i = 0; i < 15; i++) {
-            let elf = new Elf();
-            elf.x = random(0, this.canvas.width - 40);
-            elf.y = random(0, this.canvas.height - 40);
-            this.aEntities.push(elf);
-        }
+        // Starts with some elves at beginning.
+        const IMIN_TATA_ENEL = 0;
+        this.spawnElves(IMIN_TATA_ENEL);
 
         // map of every keys currently pressed
         this.keys = [];
@@ -43,7 +39,7 @@ class Game {
         this.previousTime = Date.now();
 
         // tree spawning
-        this.timeSincePreviousBlossom = 0;
+        this.timeSincePreviousBlossom = 100001; // > TIME_BETWEEN_BLOSSOM to make a tree spawn at start
         this.TIME_BETWEEN_BLOSSOM = 10000;
 
         // debug infos
@@ -80,16 +76,18 @@ class Game {
             if (Math.random() < 0.7) {
                 // spawn bad tree
                 tree = new BadTree(this.canvas.width, this.canvas.height);
+                this.spawnElves(1); // bad tree summons 1 elf
             } else {
                 // spawn good tree
                 tree = new GoodTree(this.canvas.width, this.canvas.height);
+                this.spawnElves(2); // good tree summons 2 elf
             }
 
             tree.spritesheet.addEventListener("load", () => {
                 // this part sets a new random position to the tree while it is overlapping with another one
                 let isInGoodPos;
                 let tries = 0;
-                let MAX_TRIES = 10000;
+                const MAX_TRIES = 10000;
                 do {
                     tree.setRandomPosition();
                     isInGoodPos = true;
@@ -125,11 +123,50 @@ class Game {
             ue.update(elapsedTime, this.keys, this.canvas.width, this.canvas.height);
         });
 
-        // collision and endgame checking
-        this.collideSanta();
-        if (this.santa.euro <= 0 || (this.GAMETIME - this.lifeTime) <= 0) {
+        // collision
+        for (let i = 1; i < this.aEntities.length; ++i) {
+            if (intersects(this.santa.x, this.santa.y, this.santa.WIDTH, this.santa.HEIGHT, this.aEntities[i].x, this.aEntities[i].y, this.aEntities[i].WIDTH, this.aEntities[i].HEIGHT)) {
+                const collidingEntity = this.aEntities[i];
+                if (!this.santa.isIntangible && collidingEntity instanceof Elf) {
+                    this.santa.gotHit(this.aEntities[i].x, this.aEntities[i].y, this.canvas.width, this.canvas.height);
+                }
+            }
+        }
+
+        let currentUAEntitiesLength = this.uaEntities.length;
+        for (let i = 0; i < currentUAEntitiesLength; i++) {
+            if (intersects(this.santa.x, this.santa.y, this.santa.WIDTH, this.santa.HEIGHT, this.uaEntities[i].x, this.uaEntities[i].y, this.uaEntities[i].WIDTH, this.uaEntities[i].HEIGHT)) {
+                const collidingEntity = this.uaEntities[i];
+                if (collidingEntity instanceof BadTree || collidingEntity instanceof GoodTree) {
+                    this.santa.gift -= collidingEntity.TAKEN_GIFTS; // here number
+                    if (this.santa.gift <= 0) {
+                        this.stop();
+                        this.gameOver("Vous avez gagné !", "Il vous restait " + this.santa.euro + " euros.");
+                        return;
+                    }
+                    this.uaEntities.splice(i, 1);
+                    currentUAEntitiesLength--;
+                }
+                // TODO Ball here
+                else {
+                    throw new Error("Can't determine type of colliding entity.");
+                }
+            }
+        }
+
+        // unroot dead trees (remove !isAlive trees from memory)
+        currentUAEntitiesLength = this.uaEntities.length;
+        for (let i = 0; i < currentUAEntitiesLength; i++) {
+            if (!this.uaEntities[i].isAlive) {
+                this.uaEntities.splice(i, 1);
+                currentUAEntitiesLength--;
+            }
+        }
+
+        // endgame checking
+        if (this.santa.euro <= 0 || (this.GAMETIME - this.lifeTime) <= 0) { // no euros
             this.stop();
-            this.gameOver();
+            this.gameOver("Vous avez perdu !", "Il vous restait " + this.santa.gift + " cadeaux.");
             return;
         }
 
@@ -140,8 +177,7 @@ class Game {
     draw(elapsedTime) {
         // redraw background
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.context.fillStyle = this.context.createPattern(this.bg, 'repeat');
-        this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        this.drawBG();
 
         // draw every entity
         this.aEntities.forEach((e) => {
@@ -168,41 +204,52 @@ class Game {
         }
     }
 
-    collideSanta() {
-        for (let i = 1; i < this.aEntities.length; ++i) {
-            if (intersects(this.santa.x, this.santa.y, this.santa.WIDTH, this.santa.HEIGHT, this.aEntities[i].x, this.aEntities[i].y, this.aEntities[i].WIDTH, this.aEntities[i].HEIGHT)) {
-                const collidingEntity = this.aEntities[i];
-                if (!this.santa.isIntangible && collidingEntity instanceof Elf) {
-                    this.santa.gotHit(this.aEntities[i].x, this.aEntities[i].y, this.canvas.width, this.canvas.height);
-                }
-            }
-        }
+    /**
+     * Draws the texts in parameter in the center of the canvas.
+     * @param gameOverText1 first line of text.
+     * @param gameOverText2 second line of text..
+     */
+    gameOver(gameOverText1, gameOverText2) {
+        // redraw background
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.drawBG();
 
-        let currentUAEntitiesLength = this.uaEntities.length;
-        for (let i = 0; i < currentUAEntitiesLength; i++) {
-            if (intersects(this.santa.x, this.santa.y, this.santa.WIDTH, this.santa.HEIGHT, this.uaEntities[i].x, this.uaEntities[i].y, this.uaEntities[i].WIDTH, this.uaEntities[i].HEIGHT)) {
-                const collidingEntity = this.uaEntities[i];
-                if (collidingEntity instanceof BadTree || collidingEntity instanceof GoodTree) {
-                    this.santa.gift -= collidingEntity.TAKEN_GIFTS;
-                    this.uaEntities.splice(i, 1);
-                    currentUAEntitiesLength--;
-                }
-                // TODO Ball here
-                else {
-                    throw new Error("Can't determine type of colliding entity.");
-                }
-            }
-        }
-    }
+        const yShift = 20;
 
-    gameOver() {
-        this.draw(0);
         this.context.fillStyle = "#000000";
-        const gameOverText = "Vous avez perdu !";
-        this.context.fillText(gameOverText, (this.canvas.width - this.context.measureText(gameOverText).width) / 2, this.canvas.height / 2);
+        this.context.fillText(gameOverText1, (this.canvas.width - this.context.measureText(gameOverText1).width) / 2, this.canvas.height / 2 - yShift);
+        this.context.fillText(gameOverText2, (this.canvas.width - this.context.measureText(gameOverText2).width) / 2, this.canvas.height / 2 + yShift);
     }
 
+    /**
+     * Stops the game.
+     */
     stop() {
         clearInterval(this.interval);
+    }
+
+    /**
+     * Renders the background on the canvas.
+     */
+    drawBG() {
+        // redraw background
+        this.context.fillStyle = this.context.createPattern(this.bg, 'repeat');
+        this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+    }
+
+    /**
+     * Spawns the given number of Elf in a random position.
+     * @param n the number of Elf to spawn.
+     */
+    spawnElves(n) {
+        for (let i = 0; i < n; i++) {
+            let elf = new Elf();
+            elf.spritesheet.addEventListener("load", () => {
+                elf.x = random(0, this.canvas.width - elf.WIDTH);
+                elf.y = random(0, this.canvas.height - elf.HEIGHT);
+                this.aEntities.push(elf);
+            });
+        }
     }
 }
