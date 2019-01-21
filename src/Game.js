@@ -146,9 +146,6 @@ class Game {
                 if (!this.santa.isIntangible && collidingEntity instanceof Elf) {
                     this.santa.gotHit(this.aEntities[i].x, this.aEntities[i].y, this.canvas.width, this.canvas.height);
                 }
-                else {
-                    throw new Error("Can't determine type of colliding entity.");
-                }
             }
         }
 
