@@ -6,7 +6,14 @@ class Santa extends Character {
         super(spriteSource, nX, nY, horatio);
 
         // gameplay attributes
-        this.speed = 0.2
+        this.speed = 0.2;
+
+        this.euro = 100;
+        this.gift = 100;
+
+        this.isIntangible = false;
+        this.INTANGIBILITY_TIME = 500; // ms of intangibility after having been hit
+        this.intangibilityTime = 0;
     }
 
     /**
@@ -21,7 +28,12 @@ class Santa extends Character {
             throw new Error("IllegalArgument : keys must ba an array of currently pressed keys");
         }
 
-        this.isMoving = false;
+        if (this.isIntangible) {
+            this.intangibilityTime += elapsedTime;
+            if (this.intangibilityTime >= this.INTANGIBILITY_TIME) {
+                this.isIntangible = false;
+            }
+        }
 
         if (keys.length !== 0) {
 
@@ -58,11 +70,40 @@ class Santa extends Character {
 
             const nb = (up | 0) + (down | 0) + (left | 0) + (right | 0);
 
-            this.isMoving = true;
             this.move((((right | 0) - (left | 0)) * this.speed) / Math.sqrt(nb) * elapsedTime,
                 ((down | 0) - (up | 0)) * this.speed / Math.sqrt(nb) * elapsedTime,
                 canvasWidth,
                 canvasHeight);
         }
+    }
+
+    /**
+     * Updates state when having been hit.
+     *
+     * @param x abscissa of the Entity which hit Santa
+     * @param y ordinate of the Entity which hit Santa
+     * @param canvasWidth Width of the game canvas
+     * @param canvasHeight Height of the game canvas
+
+     */
+    gotHit(x, y, canvasWidth, canvasHeight) {
+        this.euro -= 5;
+        this.isIntangible = true;
+        this.intangibilityTime = 0;
+
+        // too complicated for now
+        // const knockbackDist = 50; // in px
+        //
+        // if (this.x < x) {
+        //     this.move(-knockbackDist, 0, canvasWidth, canvasHeight);
+        // } else {
+        //     this.move(knockbackDist, 0, canvasWidth, canvasHeight);
+        // }
+        //
+        // if (this.y < y) {
+        //     this.move(0, -knockbackDist, canvasWidth, canvasHeight);
+        // } else {
+        //     this.move(0, knockbackDist, canvasWidth, canvasHeight);
+        // }
     }
 }

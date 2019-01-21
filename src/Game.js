@@ -15,19 +15,14 @@ class Game {
         this.bg.src = "../rc/snow.jpg";
 
         // player santa
-        let santa = new Santa("../rc/santa.png", 3, 4, 0.5);
+        this.santa = new Santa("../rc/santa.png", 3, 4, 0.5);
 
         // all the Character managed in the game
         this.entities = [];
-        //this.entities.push(santa); //TODO uncomment
+        this.entities.push(this.santa); //TODO uncomment
 
         // TODO remove test elf
-        // random santa
-        let elf = new Elf("../rc/santa.png", 3, 4, 0.5);
-        elf.x = random(0, this.canvas.width - 40);
-        elf.y = random(0, this.canvas.height - 40);
-        this.entities.push(elf);
-        for (let i = 0; i < 1500; i++) {
+        for (let i = 0; i < 15; i++) {
             let elf = new Elf("../rc/elf.png", 3, 4);
             elf.x = random(0, this.canvas.width - 40);
             elf.y = random(0, this.canvas.height - 40);
@@ -37,13 +32,22 @@ class Game {
         // map of every keys currently pressed
         this.keys = [];
 
-        // timing attributes
+        // timing general attributes
+        this.lifeTime = 0;
+        this.GAMETIME = 210000; // 3:30 game
         this.previousTime = Date.now();
+
+        // tree spawning
+        this.timeSincePreviousBlossom = 0;
+        this.TIME_BETWEEN_BLOSSOM = 10000;
+
+        // debug infos
+        this.DEBUG_MODE = true;
     }
 
     start() {
-        const FRAMETIME = 1000 / 60;
-        this.interval = setInterval(this.update.bind(this), FRAMETIME);
+        const FPS = 60;
+        this.interval = setInterval(this.update.bind(this), 1000 / FPS);
 
         window.addEventListener('keydown', (e) => {
             e.preventDefault();
@@ -56,33 +60,84 @@ class Game {
     }
 
     update() {
+        // timing management
         const currentTime = Date.now();
         const elapsedTime = currentTime - this.previousTime;
+        this.lifeTime += elapsedTime;
+        this.timeSincePreviousBlossom += elapsedTime;
+        this.previousTime = currentTime;
 
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.drawBG();
 
+        // spawns a tree if it is time
+        if (this.timeSincePreviousBlossom >= this.TIME_BETWEEN_BLOSSOM) {
+            this.timeSincePreviousBlossom = 0;
+            // this.entities.push() //TODO tree spawn
+        }
+
+        // update every entity
         this.entities.forEach((e) => {
             e.update(elapsedTime, this.keys, this.canvas.width, this.canvas.height);
+        });
+
+        // collision and endgame checking
+        this.collideSanta();
+        if (this.santa.euro <= 0 || (this.GAMETIME - this.lifeTime) <= 0) {
+            this.stop();
+            this.gameOver();
+            return;
+        }
+
+        // renders the canvas
+        this.draw(elapsedTime);
+    }
+
+    draw(elapsedTime) {
+        // redraw background
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.context.fillStyle = this.context.createPattern(this.bg, 'repeat');
+        this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // draw every entity
+        this.entities.forEach((e) => {
             e.draw(this.context);
         });
 
-        // debug infos
-        this.context.fillStyle = "#ff00ff";
-        this.context.fillText("FPS : " + (1000 / elapsedTime).toFixed(2), 1, this.canvas.height - 20);
+        // display chronometer
+        this.context.fillStyle = "#000000";
+        this.context.fillText(s2mmss((this.GAMETIME - this.lifeTime) / 1000), 5, 30);
 
-        this.previousTime = currentTime;
+        // display gifts and euros
+        this.context.fillText("Euros : " + this.santa.euro.toString(), 280, 30);
+        this.context.fillText("Cadeaux : " + this.santa.gift.toString(), 580, 30);
+
+
+        // debug infos
+        if (this.DEBUG_MODE) {
+            this.context.fillText(s2mmss(this.lifeTime / 1000), 5, this.canvas.height - 50);
+            this.context.fillText("FPS : " + (1000 / elapsedTime).toFixed(2), 5, this.canvas.height - 15);
+        }
+    }
+
+    collideSanta() {
+        if (!this.santa.isIntangible) {
+            for (let i = 1; i < this.entities.length; ++i) {
+                if (intersects(this.santa.x, this.santa.y, this.santa.WIDTH, this.santa.HEIGHT, this.entities[i].x, this.entities[i].y, this.entities[i].WIDTH, this.entities[i].HEIGHT)) {
+                    this.santa.gotHit(this.entities[i].x, this.entities[i].y, this.canvas.width, this.canvas.height);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    gameOver() {
+        this.draw(0);
+        this.context.fillStyle = "#000000";
+        const gameOverText = "Vous avez perdu !";
+        this.context.fillText(gameOverText, (this.canvas.width - this.context.measureText(gameOverText).width) / 2, this.canvas.height / 2);
     }
 
     stop() {
         clearInterval(this.interval);
-    }
-
-    /**
-     * Draws a background with the "snow.png" image on the game canvas.
-     */
-    drawBG() {
-        this.context.fillStyle = this.context.createPattern(this.bg, 'repeat');
-        this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }
 }
