@@ -3,7 +3,7 @@ class Santa extends AnimatedEntity {
      * Constructor of Santa.
      */
     constructor() {
-        super("../rc/santa.png", 3, 4, 0.5);
+        super("../rc/images/santa.png", 3, 4, 0.5);
 
         // gameplay attributes
         this.speed = 0.2;

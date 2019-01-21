@@ -3,7 +3,7 @@ class Elf extends AnimatedEntity {
      * Constructor of Elf.
      */
     constructor() {
-        super("../rc/elf.png", 3, 4, 1);
+        super("../rc/images/elf.png", 3, 4, 1);
 
         // gameplay attributes
         this.speed = 0.07;

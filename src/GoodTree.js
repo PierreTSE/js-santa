@@ -2,8 +2,8 @@ class GoodTree extends Tree {
     /**
      * {@link Entity#constructor}
      */
-    constructor(spriteSource, nX, nY, horatio) {
-        super("../rc/good_tree.png", 4, 1, 1);
+    constructor(canvasWidth, canvasHeight) {
+        super("../rc/good_tree.png", 4, 1, 1, canvasWidth, canvasHeight);
 
         this.LONGEVITY = 10000; // in ms
         this.SPAWNED_ELVES = 2;

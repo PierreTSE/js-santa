@@ -12,7 +12,7 @@ class Game {
 
         // background image
         this.bg = new Image();
-        this.bg.src = "../rc/snow2.jpg";
+        this.bg.src = "../rc/images/snow2.jpg";
 
         // all the Entity managed in the game
         this.aEntities = []; // animated entities
@@ -27,7 +27,7 @@ class Game {
         this.aEntities.push(this.santa);
 
         // TODO remove test elf
-        for (let i = 0; i < 0; i++) {
+        for (let i = 0; i < 15; i++) {
             let elf = new Elf();
             elf.x = random(0, this.canvas.width - 40);
             elf.y = random(0, this.canvas.height - 40);
@@ -76,13 +76,15 @@ class Game {
         // spawns a tree if it is time
         if (this.timeSincePreviousBlossom >= this.TIME_BETWEEN_BLOSSOM) {
             this.timeSincePreviousBlossom = 0;
+            let tree;
             if (Math.random() < 0.7) {
                 // spawn bad tree
-                this.uaEntities.push(new BadTree());
+                tree = new BadTree(this.canvas.width, this.canvas.height);
             } else {
                 // spawn good tree
-                this.uaEntities.push(new GoodTree());
+                tree = new GoodTree(this.canvas.width, this.canvas.height);
             }
+            this.uaEntities.push(tree);
         }
 
         // update every Entity
@@ -117,7 +119,7 @@ class Game {
             e.draw(this.context);
         });
 
-        this.uaentities.forEach((e) => {
+        this.uaEntities.forEach((e) => {
             e.draw(this.context);
         });
 
@@ -153,8 +155,8 @@ class Game {
         let currentUAEntitiesLength = this.uaEntities.length;
         for (let i = 0; i < currentUAEntitiesLength; i++) {
             if (intersects(this.santa.x, this.santa.y, this.santa.WIDTH, this.santa.HEIGHT, this.uaEntities[i].x, this.uaEntities[i].y, this.uaEntities[i].WIDTH, this.uaEntities[i].HEIGHT)) {
-                const collidingEntity = this.aEntities[i];
-                if (collidingEntity instanceof BadTree || collidingEntity instanceof BadTree) {
+                const collidingEntity = this.uaEntities[i];
+                if (collidingEntity instanceof BadTree || collidingEntity instanceof GoodTree) {
                     this.santa.gift -= collidingEntity.TAKEN_GIFTS;
                     this.uaEntities.slice(i, 1);
                     currentUAEntitiesLength--;
