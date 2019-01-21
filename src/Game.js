@@ -12,21 +12,26 @@ class Game {
 
         // background image
         this.bg = new Image();
-        this.bg.src = "../rc/snow.jpg";
+        this.bg.src = "../rc/snow2.jpg";
 
-        // player santa
-        this.santa = new Santa();
+        // all the Entity managed in the game
+        this.aEntities = []; // animated entities
+        this.uaEntities = []; // unanimated entities
 
         // all the Entity managed in the game
         this.entities = [];
         this.entities.push(this.santa);
+
+        // player santa
+        this.santa = new Santa();
+        this.aEntities.push(this.santa);
 
         // TODO remove test elf
         for (let i = 0; i < 0; i++) {
             let elf = new Elf();
             elf.x = random(0, this.canvas.width - 40);
             elf.y = random(0, this.canvas.height - 40);
-            this.entities.push(elf);
+            this.aEntities.push(elf);
         }
 
         // map of every keys currently pressed
@@ -39,7 +44,7 @@ class Game {
 
         // tree spawning
         this.timeSincePreviousBlossom = 0;
-        this.TIME_BETWEEN_BLOSSOM = 10000;
+        this.TIME_BETWEEN_BLOSSOM = 1000; // TODO should be 10000
 
         // debug infos
         this.DEBUG_MODE = true;
@@ -71,12 +76,22 @@ class Game {
         // spawns a tree if it is time
         if (this.timeSincePreviousBlossom >= this.TIME_BETWEEN_BLOSSOM) {
             this.timeSincePreviousBlossom = 0;
-            // this.entities.push() //TODO tree spawn
+            if (Math.random() < 0.7) {
+                // spawn bad tree
+                this.uaEntities.push(new BadTree());
+            } else {
+                // spawn good tree
+                this.uaEntities.push(new GoodTree());
+            }
         }
 
-        // update every entity
-        this.entities.forEach((e) => {
-            e.update(elapsedTime, this.keys, this.canvas.width, this.canvas.height);
+        // update every Entity
+        this.aEntities.forEach((ae) => {
+            ae.update(elapsedTime, this.keys, this.canvas.width, this.canvas.height);
+        });
+
+        this.uaEntities.forEach((ue) => {
+            ue.update(elapsedTime, this.keys, this.canvas.width, this.canvas.height);
         });
 
         // collision and endgame checking
@@ -98,7 +113,11 @@ class Game {
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
         // draw every entity
-        this.entities.forEach((e) => {
+        this.aEntities.forEach((e) => {
+            e.draw(this.context);
+        });
+
+        this.uaentities.forEach((e) => {
             e.draw(this.context);
         });
 
@@ -119,18 +138,31 @@ class Game {
     }
 
     collideSanta() {
-        for (let i = 1; i < this.entities.length; ++i) {
-            if (intersects(this.santa.x, this.santa.y, this.santa.WIDTH, this.santa.HEIGHT, this.entities[i].x, this.entities[i].y, this.entities[i].WIDTH, this.entities[i].HEIGHT)) {
-                const collidingEntity = this.entities[i];
+        for (let i = 1; i < this.aEntities.length; ++i) {
+            if (intersects(this.santa.x, this.santa.y, this.santa.WIDTH, this.santa.HEIGHT, this.aEntities[i].x, this.aEntities[i].y, this.aEntities[i].WIDTH, this.aEntities[i].HEIGHT)) {
+                const collidingEntity = this.aEntities[i];
                 if (!this.santa.isIntangible && collidingEntity instanceof Elf) {
-                    this.santa.gotHit(this.entities[i].x, this.entities[i].y, this.canvas.width, this.canvas.height);
+                    this.santa.gotHit(this.aEntities[i].x, this.aEntities[i].y, this.canvas.width, this.canvas.height);
                 }
-                //else if (collidingEntity instanceof Tree) {
-                //TODO implémenter collision tree
-                //}
-                // else {
-                //     throw new Error("Can't determine type of colliding entity.");
-                // }
+                else {
+                    throw new Error("Can't determine type of colliding entity.");
+                }
+            }
+        }
+
+        let currentUAEntitiesLength = this.uaEntities.length;
+        for (let i = 0; i < currentUAEntitiesLength; i++) {
+            if (intersects(this.santa.x, this.santa.y, this.santa.WIDTH, this.santa.HEIGHT, this.uaEntities[i].x, this.uaEntities[i].y, this.uaEntities[i].WIDTH, this.uaEntities[i].HEIGHT)) {
+                const collidingEntity = this.aEntities[i];
+                if (collidingEntity instanceof BadTree || collidingEntity instanceof BadTree) {
+                    this.santa.gift -= collidingEntity.TAKEN_GIFTS;
+                    this.uaEntities.slice(i, 1);
+                    currentUAEntitiesLength--;
+                }
+                // TODO Ball here
+                else {
+                    throw new Error("Can't determine type of colliding entity.");
+                }
             }
         }
     }
