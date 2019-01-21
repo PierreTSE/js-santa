@@ -64,5 +64,5 @@ function random(min, max) {
  * @returns {number} A random integer.
  */
 function randint(min, max) {
-    return Math.round(random(min, max));
+    return Math.floor(random(min, max));
 }
