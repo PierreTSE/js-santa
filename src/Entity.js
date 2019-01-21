@@ -44,6 +44,15 @@ class Entity {
         // coordinates of the top-left corner
         this.x = 0;
         this.y = 0;
+
+        // sprite selection attributes
+        /**
+         * 1 : up
+         * 2 : right
+         * 3 : down
+         * 4 : left
+         */
+        this.orientation = 2;
     }
 
     /**

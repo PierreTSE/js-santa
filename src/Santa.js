@@ -52,9 +52,12 @@ class Santa extends AnimatedEntity {
             }
 
             if (!up && !down && !left && !right) {
-                this.isMoving = false;
+                this.animationState = 1;
+                this.timeSincePreviousAnimation = 0;
                 return;
             }
+
+            this.updateAnimation(elapsedTime);
 
             if (up) {
                 this.orientation = 1;

@@ -21,6 +21,9 @@ class Elf extends AnimatedEntity {
         this.down = false;
         this.left = false;
         this.right = false;
+
+        // animation must be started for IA
+        this.animationState = 0;
     }
 
     /**
@@ -75,7 +78,7 @@ class Elf extends AnimatedEntity {
                     this.orientation = 4;
                     break;
                 default:
-                    throw new Error("Default cas reached");
+                    throw new Error("Default case reached");
             }
 
             this.wantsToReorientate = false;
@@ -130,8 +133,13 @@ class Elf extends AnimatedEntity {
         // actual movement according to current inputs
         const nb = (this.up | 0) + (this.down | 0) + (this.left | 0) + (this.right | 0);
 
-        if (nb === 0)
-            return; // no inputs, stays in place
+        if (nb === 0) { // no inputs, stays in place
+            this.animationState = 1;
+            this.timeSincePreviousAnimation = 0;
+            return;
+        }
+
+        this.updateAnimation(elapsedTime);
 
         this.move((((this.right | 0) - (this.left | 0)) * this.speed) / Math.sqrt(nb) * elapsedTime,
             ((this.down | 0) - (this.up | 0)) * this.speed / Math.sqrt(nb) * elapsedTime,

@@ -19,10 +19,10 @@ class Game {
 
         // all the Entity managed in the game
         this.entities = [];
-        this.entities.push(this.santa); //TODO uncomment
+        this.entities.push(this.santa);
 
         // TODO remove test elf
-        for (let i = 0; i < 15; i++) {
+        for (let i = 0; i < 0; i++) {
             let elf = new Elf();
             elf.x = random(0, this.canvas.width - 40);
             elf.y = random(0, this.canvas.height - 40);
