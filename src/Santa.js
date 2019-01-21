@@ -1,4 +1,4 @@
-class Santa extends Entity{
+class Santa extends Character {
     /**
      * {@link Entity#constructor}
      */

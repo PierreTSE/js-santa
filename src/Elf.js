@@ -1,4 +1,4 @@
-class Elf extends Entity {
+class Elf extends Character {
     /**
      * {@link Entity#constructor}
      */

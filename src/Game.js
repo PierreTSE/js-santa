@@ -14,7 +14,7 @@ class Game {
         // player santa
         let santa = new Santa("../rc/santa.png", 3, 4, 0.5);
 
-        // all the Entity managed in the game
+        // all the Character managed in the game
         this.entities = [];
         this.entities.push(santa);
 
