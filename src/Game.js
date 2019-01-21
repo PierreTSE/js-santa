@@ -1,7 +1,7 @@
 class Game {
     constructor(canvas) {
         if (!(canvas instanceof HTMLElement) || !(canvas.nodeName === "CANVAS")) {
-            throw new Error("IllegalArgument : must be a <canvas>")
+            throw new Error("IllegalArgument : canvas must be a <canvas>")
         }
 
         this.canvas = canvas;
@@ -16,13 +16,18 @@ class Game {
 
         // all the Character managed in the game
         this.entities = [];
-        this.entities.push(santa);
+        //this.entities.push(santa); //TODO uncomment
 
         // TODO remove test elf
-        for (let i = 0; i < 666; i++) {
+        // random santa
+        let elf = new Elf("../rc/santa.png", 3, 4, 0.5);
+        elf.x = random(0, this.canvas.width - 40);
+        elf.y = random(0, this.canvas.height - 40);
+        this.entities.push(elf);
+        for (let i = 0; i < 1500; i++) {
             let elf = new Elf("../rc/elf.png", 3, 4);
-            elf.x = random(0, this.canvas.width);
-            elf.y = random(0, this.canvas.height);
+            elf.x = random(0, this.canvas.width - 40);
+            elf.y = random(0, this.canvas.height - 40);
             this.entities.push(elf);
         }
 
