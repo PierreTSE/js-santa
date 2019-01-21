@@ -1,12 +1,12 @@
-class Elf extends Character {
+class Elf extends AnimatedEntity {
     /**
-     * {@link Entity#constructor}
+     * Constructor of Elf.
      */
-    constructor(spriteSource, nX, nY, horatio) {
-        super(spriteSource, nX, nY, horatio);
+    constructor() {
+        super("../rc/elf.png", 3, 4, 1);
 
         // gameplay attributes
-        this.speed = 0.05;
+        this.speed = 0.07;
         this.isStunned = false;
 
         // elf IA attributes

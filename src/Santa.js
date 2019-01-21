@@ -1,9 +1,9 @@
-class Santa extends Character {
+class Santa extends AnimatedEntity {
     /**
-     * {@link Entity#constructor}
+     * Constructor of Santa.
      */
-    constructor(spriteSource, nX, nY, horatio) {
-        super(spriteSource, nX, nY, horatio);
+    constructor() {
+        super("../rc/santa.png", 3, 4, 0.5);
 
         // gameplay attributes
         this.speed = 0.2;
