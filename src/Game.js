@@ -7,6 +7,9 @@ class Game {
         this.canvas = canvas;
         this.context = this.canvas.getContext("2d");
 
+        // canvas attributes
+        this.context.font = "bold 30px Arial";
+
         // background image
         this.bg = new Image();
         this.bg.src = "../rc/snow.jpg";
@@ -63,6 +66,10 @@ class Game {
             e.update(elapsedTime, this.keys, this.canvas.width, this.canvas.height);
             e.draw(this.context);
         });
+
+        // debug infos
+        this.context.fillStyle = "#ff00ff";
+        this.context.fillText("FPS : " + (1000 / elapsedTime).toFixed(2), 1, this.canvas.height - 20);
 
         this.previousTime = currentTime;
     }
