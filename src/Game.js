@@ -18,6 +18,14 @@ class Game {
         this.entities = [];
         this.entities.push(santa);
 
+        // TODO remove test elf
+        for (let i = 0; i < 666; i++) {
+            let elf = new Elf("../rc/elf.png", 3, 4);
+            elf.x = random(0, this.canvas.width);
+            elf.y = random(0, this.canvas.height);
+            this.entities.push(elf);
+        }
+
         // map of every keys currently pressed
         this.keys = [];
 
