@@ -20,13 +20,31 @@ class Game {
         // all the Entity managed in the game
         this.entities = [];
         this.entities.push(this.santa); //TODO uncomment
-
+        this.uaentities=[] //array of unanimated entities
+        /*
         // TODO remove test elf
         for (let i = 0; i < 15; i++) {
             let elf = new Elf();
             elf.x = random(0, this.canvas.width - 40);
             elf.y = random(0, this.canvas.height - 40);
             this.entities.push(elf);
+        }
+        */
+
+        // TODO remove test trees
+        for (let i = 0; i < 10; i++) {
+            if (i>5){
+                let badTree = new (BadTree);
+                badTree.x = random(0, this.canvas.width - 40);
+                badTree.y = random(0, this.canvas.height - 40);
+                this.uaentities.push(badTree);
+            }
+            else{
+                let goodTree = new (GoodTree);
+                goodTree.x = random(0, this.canvas.width - 40);
+                goodTree.y = random(0, this.canvas.height - 40);
+                this.uaentities.push(goodTree);
+            }
         }
 
         // map of every keys currently pressed
@@ -99,6 +117,10 @@ class Game {
 
         // draw every entity
         this.entities.forEach((e) => {
+            e.draw(this.context);
+        });
+
+        this.uaentities.forEach((e) => {
             e.draw(this.context);
         });
 
