@@ -32,10 +32,14 @@ class Entity {
         this.spritesheet.addEventListener("load", () => {
             this.spriteWidth = this.spritesheet.width / nX;
             this.spriteHeight = this.spritesheet.height / nY;
+
+            // actual rendered dimensions
+            this.WIDTH = this.spriteWidth * this.HORATIO;
+            this.HEIGHT = this.spriteHeight * this.HORATIO;
         });
 
         // ratio at which the sprite is resized before rendering
-        this.horatio = horatio;
+        this.HORATIO = horatio;
 
         // coordinates of the top-left corner
         this.x = 0;
@@ -50,7 +54,7 @@ class Entity {
      * @param canvasHeight Height of the game canvas
      */
     move(dx, dy, canvasWidth, canvasHeight) {
-        this.x = clamp(this.x + dx, 0, canvasWidth - this.spriteWidth * this.horatio);
-        this.y = clamp(this.y + dy, 0, canvasHeight - this.spriteHeight * this.horatio);
+        this.x = clamp(this.x + dx, 0, canvasWidth - this.WIDTH);
+        this.y = clamp(this.y + dy, 0, canvasHeight - this.HEIGHT);
     }
 }
