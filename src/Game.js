@@ -156,6 +156,7 @@ class Game {
             if (intersects(this.santa.x, this.santa.y, this.santa.WIDTH, this.santa.HEIGHT, this.trees[i].x, this.trees[i].y, this.trees[i].WIDTH, this.trees[i].HEIGHT)) {
                 const collidingEntity = this.trees[i];
                 if (collidingEntity instanceof BadTree || collidingEntity instanceof GoodTree) {
+                    this.santa.hohoho();
                     this.santa.gift -= collidingEntity.TAKEN_GIFTS; // here number
                     if (this.santa.gift <= 0) {
                         this.stop();

@@ -14,6 +14,17 @@ class Santa extends AnimatedEntity {
         this.isIntangible = false;
         this.INTANGIBILITY_TIME = 500; // ms of intangibility after having been hit
         this.intangibilityTime = 0;
+
+        // sounds
+        this.hitSounds = []; // sounds when being hit
+        this.hitSounds.push(new Audio("../rc/audio/laughs/laugh1.mp3"));
+        this.hitSounds.push(new Audio("../rc/audio/laughs/laugh2.mp3"));
+
+        this.hohoSounds = []; // when touching tree
+        this.hohoSounds.push(new Audio("../rc/audio/hohoho/1.mp3"));
+        this.hohoSounds.push(new Audio("../rc/audio/hohoho/2.mp3"));
+        this.hohoSounds.push(new Audio("../rc/audio/hohoho/3.mp3"));
+        this.hohoSounds.push(new Audio("../rc/audio/hohoho/4.mp3"));
     }
 
     /**
@@ -94,19 +105,14 @@ class Santa extends AnimatedEntity {
         this.isIntangible = true;
         this.intangibilityTime = 0;
 
-        // too complicated for now
-        // const knockbackDist = 50; // in px
-        //
-        // if (this.x < x) {
-        //     this.move(-knockbackDist, 0, canvasWidth, canvasHeight);
-        // } else {
-        //     this.move(knockbackDist, 0, canvasWidth, canvasHeight);
-        // }
-        //
-        // if (this.y < y) {
-        //     this.move(0, -knockbackDist, canvasWidth, canvasHeight);
-        // } else {
-        //     this.move(0, knockbackDist, canvasWidth, canvasHeight);
-        // }
+        // sound of elf
+        this.hitSounds[randint(0, this.hitSounds.length - 1)].play();
+    }
+
+    /**
+     * Santa laughs. Played when touching a tree.
+     */
+    hohoho() {
+        this.hohoSounds[randint(0, this.hohoSounds.length - 1)].play();
     }
 }

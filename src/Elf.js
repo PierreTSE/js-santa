@@ -135,23 +135,24 @@ class Elf extends AnimatedEntity {
 
                 this.walkingPeriod = randint(this.MIN_TIME_BEFORE_REORIENTATE, this.MAX_TIME_BEFORE_REORIENTATE);
             }
+
+            // actual movement according to current inputs
+            const nb = (this.up | 0) + (this.down | 0) + (this.left | 0) + (this.right | 0);
+
+            if (nb === 0) { // no inputs, stays in place
+                this.animationState = 1;
+                this.timeSincePreviousAnimation = 0;
+                return;
+            }
+
+            this.updateAnimation(elapsedTime);
+
+            this.move((((this.right | 0) - (this.left | 0)) * this.speed) / Math.sqrt(nb) * elapsedTime,
+                ((this.down | 0) - (this.up | 0)) * this.speed / Math.sqrt(nb) * elapsedTime,
+                canvasWidth,
+                canvasHeight);
+
         }
-
-        // actual movement according to current inputs
-        const nb = (this.up | 0) + (this.down | 0) + (this.left | 0) + (this.right | 0);
-
-        if (nb === 0) { // no inputs, stays in place
-            this.animationState = 1;
-            this.timeSincePreviousAnimation = 0;
-            return;
-        }
-
-        this.updateAnimation(elapsedTime);
-
-        this.move((((this.right | 0) - (this.left | 0)) * this.speed) / Math.sqrt(nb) * elapsedTime,
-            ((this.down | 0) - (this.up | 0)) * this.speed / Math.sqrt(nb) * elapsedTime,
-            canvasWidth,
-            canvasHeight);
     }
 
     resetInputs() {
