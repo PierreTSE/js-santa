@@ -37,7 +37,7 @@ class Game {
         this.ball = new Ball();
         this.ball.isAlive = false;
         this.ballSpawnTimes = [];
-        this.ballSpawnTimes.push(1); // DEBUG : ball when game begins
+        // this.ballSpawnTimes.push(1); // DEBUG : ball when game begins
         this.ballSpawnTimes.push(this.GAMETIME - 150000); // 2min30 = 150000ms
         this.ballSpawnTimes.push(this.GAMETIME - 70000); // 1min10 = 70000ms
 
@@ -51,7 +51,7 @@ class Game {
         this.accelerationTimes.push(190000); // 3min10 = 190000ms
 
         // debug infos
-        this.DEBUG_MODE = true;
+        this.DEBUG_MODE = false;
     }
 
     start() {
