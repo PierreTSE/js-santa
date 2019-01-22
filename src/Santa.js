@@ -25,7 +25,7 @@ class Santa extends AnimatedEntity {
      */
     update(elapsedTime, keys, canvasWidth, canvasHeight) {
         if (!Array.isArray(keys)) {
-            throw new Error("IllegalArgument : keys must ba an array of currently pressed keys");
+            throw new Error("IllegalArgument : keys must be an array of currently pressed keys");
         }
 
         if (this.isIntangible) {
