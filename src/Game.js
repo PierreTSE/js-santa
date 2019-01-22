@@ -15,16 +15,11 @@ class Game {
         this.bg.src = "../rc/images/snow2.jpg";
 
         // all the Entity managed in the game
-        this.aEntities = []; // animated entities
-        this.uaEntities = []; // unanimated entities
-
-        // all the Entity managed in the game
-        this.entities = [];
-        this.entities.push(this.santa);
+        this.elves = [];
+        this.trees = [];
 
         // player santa
         this.santa = new Santa();
-        this.aEntities.push(this.santa);
 
         // Starts with some elves at beginning.
         const IMIN_TATA_ENEL = 0;
@@ -35,8 +30,17 @@ class Game {
 
         // timing general attributes
         this.lifeTime = 0;
-        this.GAMETIME = 210000; // 3:30 game
+        this.GAMETIME = 210000; // 3min30 = 210000ms
         this.previousTime = Date.now();
+
+        // ball spawning
+        this.ball = new Ball();
+        this.ball.isAlive = false;
+        this.ballSpawnTimes = [];
+        //this.ballSpawnTimes.push(1); // DEBUG : ball when game begins
+        this.ballSpawnTimes.push(this.GAMETIME - 150000); // 2min30 = 150000ms
+        this.ballSpawnTimes.push(this.GAMETIME - 70000); // 1min10 = 70000ms
+
 
         // tree spawning
         this.timeSincePreviousBlossom = 100001; // > TIME_BETWEEN_BLOSSOM to make a tree spawn at start
@@ -76,11 +80,11 @@ class Game {
             if (Math.random() < 0.7) {
                 // spawn bad tree
                 tree = new BadTree(this.canvas.width, this.canvas.height);
-                this.spawnElves(1); // bad tree summons 1 elf
+                this.spawnElves(tree.SPAWNED_ELVES);
             } else {
                 // spawn good tree
                 tree = new GoodTree(this.canvas.width, this.canvas.height);
-                this.spawnElves(2); // good tree summons 2 elf
+                this.spawnElves(tree.SPAWNED_ELVES);
             }
 
             tree.spritesheet.addEventListener("load", () => {
@@ -91,8 +95,8 @@ class Game {
                 do {
                     tree.setRandomPosition();
                     isInGoodPos = true;
-                    for (let i in this.uaEntities) {
-                        if (intersects(tree.x, tree.y, tree.WIDTH, tree.HEIGHT, this.uaEntities[i].x, this.uaEntities[i].y, this.uaEntities[i].WIDTH, this.uaEntities[i].HEIGHT)) {
+                    for (let i in this.trees) {
+                        if (intersects(tree.x, tree.y, tree.WIDTH, tree.HEIGHT, this.trees[i].x, this.trees[i].y, this.trees[i].WIDTH, this.trees[i].HEIGHT)) {
                             isInGoodPos = false;
                             break;
                         }
@@ -106,7 +110,7 @@ class Game {
 
                 // blossom the tree
                 if (tries < MAX_TRIES) {
-                    this.uaEntities.push(tree);
+                    this.trees.push(tree);
                 }
                 else {
                     console.warn("Tree could not be created because of missing place in game area.");
@@ -114,29 +118,43 @@ class Game {
             });
         }
 
+        // spawn a ball if it is time
+        if (this.ballSpawnTimes.length !== 0 && this.lifeTime >= this.ballSpawnTimes[0]) {
+            this.ballSpawnTimes.shift(); // pop front
+            this.ball = new Ball(this.canvas.width, this.canvas.height); // only one ball at a time
+        }
+
         // update every Entity
-        this.aEntities.forEach((ae) => {
+        // Santa
+        this.santa.update(elapsedTime, this.keys, this.canvas.width, this.canvas.height);
+        // Elves
+        this.elves.forEach((ae) => {
             ae.update(elapsedTime, this.keys, this.canvas.width, this.canvas.height);
         });
-
-        this.uaEntities.forEach((ue) => {
+        // Trees
+        this.trees.forEach((ue) => {
             ue.update(elapsedTime, this.keys, this.canvas.width, this.canvas.height);
         });
 
-        // collision
-        for (let i = 1; i < this.aEntities.length; ++i) {
-            if (intersects(this.santa.x, this.santa.y, this.santa.WIDTH, this.santa.HEIGHT, this.aEntities[i].x, this.aEntities[i].y, this.aEntities[i].WIDTH, this.aEntities[i].HEIGHT)) {
-                const collidingEntity = this.aEntities[i];
-                if (!this.santa.isIntangible && collidingEntity instanceof Elf) {
-                    this.santa.gotHit(this.aEntities[i].x, this.aEntities[i].y, this.canvas.width, this.canvas.height);
+        // collisions
+        // collision with elves
+        for (let i = 0; i < this.elves.length; ++i) {
+            if (intersects(this.santa.x, this.santa.y, this.santa.WIDTH, this.santa.HEIGHT, this.elves[i].x, this.elves[i].y, this.elves[i].WIDTH, this.elves[i].HEIGHT)) {
+                const collidingEntity = this.elves[i];
+                if (!this.santa.isIntangible) {
+                    if (collidingEntity instanceof Elf) {
+                        this.santa.gotHit(this.elves[i].x, this.elves[i].y, this.canvas.width, this.canvas.height);
+                    } else {
+                        throw new Error("Can't determine type of colliding entity.");
+                    }
                 }
             }
         }
-
-        let currentUAEntitiesLength = this.uaEntities.length;
+        // collision with trees
+        let currentUAEntitiesLength = this.trees.length;
         for (let i = 0; i < currentUAEntitiesLength; i++) {
-            if (intersects(this.santa.x, this.santa.y, this.santa.WIDTH, this.santa.HEIGHT, this.uaEntities[i].x, this.uaEntities[i].y, this.uaEntities[i].WIDTH, this.uaEntities[i].HEIGHT)) {
-                const collidingEntity = this.uaEntities[i];
+            if (intersects(this.santa.x, this.santa.y, this.santa.WIDTH, this.santa.HEIGHT, this.trees[i].x, this.trees[i].y, this.trees[i].WIDTH, this.trees[i].HEIGHT)) {
+                const collidingEntity = this.trees[i];
                 if (collidingEntity instanceof BadTree || collidingEntity instanceof GoodTree) {
                     this.santa.gift -= collidingEntity.TAKEN_GIFTS; // here number
                     if (this.santa.gift <= 0) {
@@ -144,21 +162,29 @@ class Game {
                         this.gameOver("Vous avez gagné !", "Il vous restait " + this.santa.euro + " euros.");
                         return;
                     }
-                    this.uaEntities.splice(i, 1);
+                    this.trees.splice(i, 1);
                     currentUAEntitiesLength--;
                 }
-                // TODO Ball here
                 else {
                     throw new Error("Can't determine type of colliding entity.");
                 }
             }
         }
+        // collision with ball
+        if (this.ball.isAlive && intersects(this.santa.x, this.santa.y, this.santa.WIDTH, this.santa.HEIGHT, this.ball.x, this.ball.y, this.ball.WIDTH, this.ball.HEIGHT)) {
+            this.ball.isAlive = false;
+            this.ball.sound.play();
+            // stun elves
+            for (let i = 0; i < this.elves.length; i++) {
+                this.elves[i].stun();
+            }
+        }
 
         // unroot dead trees (remove !isAlive trees from memory)
-        currentUAEntitiesLength = this.uaEntities.length;
+        currentUAEntitiesLength = this.trees.length;
         for (let i = 0; i < currentUAEntitiesLength; i++) {
-            if (!this.uaEntities[i].isAlive) {
-                this.uaEntities.splice(i, 1);
+            if (!this.trees[i].isAlive) {
+                this.trees.splice(i, 1);
                 currentUAEntitiesLength--;
             }
         }
@@ -180,13 +206,20 @@ class Game {
         this.drawBG();
 
         // draw every entity
-        this.aEntities.forEach((e) => {
+        // Santa
+        this.santa.draw(this.context);
+        // Elves
+        this.elves.forEach((e) => {
             e.draw(this.context);
         });
-
-        this.uaEntities.forEach((e) => {
+        // Trees
+        this.trees.forEach((e) => {
             e.draw(this.context);
         });
+        // Ball
+        if (this.ball.isAlive) {
+            this.ball.draw(this.context);
+        }
 
         // display chronometer
         this.context.fillStyle = "#000000";
@@ -248,7 +281,7 @@ class Game {
             elf.spritesheet.addEventListener("load", () => {
                 elf.x = random(0, this.canvas.width - elf.WIDTH);
                 elf.y = random(0, this.canvas.height - elf.HEIGHT);
-                this.aEntities.push(elf);
+                this.elves.push(elf);
             });
         }
     }
