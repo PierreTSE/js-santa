@@ -37,14 +37,18 @@ class Game {
         this.ball = new Ball();
         this.ball.isAlive = false;
         this.ballSpawnTimes = [];
-        //this.ballSpawnTimes.push(1); // DEBUG : ball when game begins
+        this.ballSpawnTimes.push(1); // DEBUG : ball when game begins
         this.ballSpawnTimes.push(this.GAMETIME - 150000); // 2min30 = 150000ms
         this.ballSpawnTimes.push(this.GAMETIME - 70000); // 1min10 = 70000ms
-
 
         // tree spawning
         this.timeSincePreviousBlossom = 100001; // > TIME_BETWEEN_BLOSSOM to make a tree spawn at start
         this.TIME_BETWEEN_BLOSSOM = 10000;
+
+        // acceleration of Elves
+        this.ACCELERATION_RATIO = 2;
+        this.accelerationTimes = [];
+        this.accelerationTimes.push(190000); // 3min10 = 190000ms
 
         // debug infos
         this.DEBUG_MODE = true;
@@ -61,7 +65,12 @@ class Game {
 
         window.addEventListener('keyup', (e) => {
             this.keys[e.keyCode] = false;
-        })
+        });
+
+        // starts music
+        this.music = new Audio("../rc/audio/Hustle.mp3");
+        this.music.loop = true;
+        this.music.play();
     }
 
     update() {
@@ -71,7 +80,6 @@ class Game {
         this.lifeTime += elapsedTime;
         this.timeSincePreviousBlossom += elapsedTime;
         this.previousTime = currentTime;
-
 
         // spawns a tree if it is time
         if (this.timeSincePreviousBlossom >= this.TIME_BETWEEN_BLOSSOM) {
@@ -124,6 +132,14 @@ class Game {
             this.ball = new Ball(this.canvas.width, this.canvas.height); // only one ball at a time
         }
 
+        // accelerates if it is time
+        if (this.accelerationTimes.length !== 0 && this.lifeTime >= this.accelerationTimes[0]) {
+            this.accelerationTimes.shift(); // pop front
+            for (let i = 0; i < this.elves.length; i++) {
+                this.elves[i].speed *= this.ACCELERATION_RATIO;
+            }
+        }
+
         // update every Entity
         // Santa
         this.santa.update(elapsedTime, this.keys, this.canvas.width, this.canvas.height);
@@ -174,11 +190,17 @@ class Game {
         // collision with ball
         if (this.ball.isAlive && intersects(this.santa.x, this.santa.y, this.santa.WIDTH, this.santa.HEIGHT, this.ball.x, this.ball.y, this.ball.WIDTH, this.ball.HEIGHT)) {
             this.ball.isAlive = false;
-            this.ball.sound.play();
             // stun elves
             for (let i = 0; i < this.elves.length; i++) {
                 this.elves[i].stun();
             }
+
+            // play ball sound
+            this.music.pause();
+            this.ball.sound.play();
+            this.ball.sound.addEventListener("ended", () => {
+                this.music.play();
+            })
         }
 
         // unroot dead trees (remove !isAlive trees from memory)
@@ -260,6 +282,9 @@ class Game {
      */
     stop() {
         clearInterval(this.interval);
+        this.music.pause();
+        this.elves = [];
+        this.trees = [];
     }
 
     /**
