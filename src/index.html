@@ -11,10 +11,12 @@
 
     <title>Le Père Noël est une poubelle</title>
 </head>
-<body onload="startGame()">
+<body onload="testBrowser()">
 
 <!--Main Canvas to render the game-->
 <canvas id="cv" width="800" height="600"></canvas>
+
+<div id="clickHere" style="text-align: center; display: none"><a>Merci de cliquer pour commencer</a></div>
 
 <script src="utilities.js"></script>
 <script src="Entity.js"></script>
@@ -22,6 +24,7 @@
 <script src="Santa.js"></script>
 <script src="Elf.js"></script>
 <script src="UnanimatedEntity.js"></script>
+<script src="Ball.js"></script>
 <script src="Tree.js"></script>
 <script src="BadTree.js"></script>
 <script src="GoodTree.js"></script>
@@ -30,8 +33,25 @@
     // instance of the game
     let game = new Game(document.getElementById("cv"));
 
-    // starts game on page load
+    // test browser : Chrome needs special management for sound
+    function testBrowser() {
+        const isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
+        if (isChrome) {
+            document.getElementById("clickHere").style.display = "block"; // shows text
+            window.addEventListener("click", () => {
+                startGame();
+                window.removeEventListener("click", () => {
+                });
+            })
+        } else {
+            startGame();
+        }
+    }
+
+    // start game on page load
     function startGame() {
+        document.body.removeAttribute("onclick");
+        document.getElementById("clickHere").style.display = "none";
         game.start();
     }
 </script>
