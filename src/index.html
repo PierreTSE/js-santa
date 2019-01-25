@@ -6,6 +6,11 @@
     <style>
         #cv {
             border: 1px solid #000000;
+            padding-left: 0;
+            padding-right: 0;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
         }
     </style>
 
@@ -35,14 +40,9 @@
 
     // test browser : Chrome needs special management for sound
     function testBrowser() {
-        const isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
-        if (isChrome) {
+        if (navigator.userAgent.indexOf("Chrome") !== -1) {
             document.getElementById("clickHere").style.display = "block"; // shows text
-            window.addEventListener("click", () => {
-                startGame();
-                window.removeEventListener("click", () => {
-                });
-            })
+            window.addEventListener("click", startGame)
         } else {
             startGame();
         }
@@ -50,7 +50,8 @@
 
     // start game on page load
     function startGame() {
-        document.body.removeAttribute("onclick");
+        window.removeEventListener("click", startGame);
+        document.body.removeAttribute("onload");
         document.getElementById("clickHere").style.display = "none";
         game.start();
     }
